@@ -44,10 +44,8 @@ elapsed_time = 0
 sampleTime = 10 # 5 seconds
 sample_counter = 0
 quit = False
-all_data = np.zeros(6)
 while not quit:
 	data, samples_per_channel_received = task.read()
-	all_data = np.vstack([all_data,data[0]])
 	sample_counter += 1
 
 	print "Sample DATA: ", str(data[0])[1:-1]
@@ -61,11 +59,4 @@ while not quit:
 
 		print "Time is up!"
 
-print "Total samples collected:", sample_counter, " samples"
-print "Time elapsed", elapsed_time, " seconds"
-print "Observed Frequency", sample_counter/elapsed_time, " Hz"
-
-plt.figure()
-plt.plot(all_data)
-plt.show()
 
