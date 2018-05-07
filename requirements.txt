@@ -1,6 +1,5 @@
 backports.functools-lru-cache==1.5
 cycler==0.10.0
-daqmx==0.0.2
 h5py==2.7.1
 kiwisolver==1.0.1
 matplotlib==2.2.2
