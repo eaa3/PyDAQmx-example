@@ -1,0 +1,13 @@
+backports.functools-lru-cache==1.5
+cycler==0.10.0
+daqmx==0.0.2
+h5py==2.7.1
+kiwisolver==1.0.1
+matplotlib==2.2.2
+numpy==1.14.3
+pandas==0.22.0
+PyDAQmx==1.4.1
+pyparsing==2.2.0
+python-dateutil==2.7.2
+pytz==2018.4
+six==1.11.0
