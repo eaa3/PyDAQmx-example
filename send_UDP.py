@@ -64,7 +64,7 @@ if __name__== "__main__":
 		
 
 		#print "Sample DATA: ", str(data[0])[1:-1]
-		sdata = str(data[0])[1:-1] + ' %.6f'%(time.time(),) + '\n'
+		sdata = str(data[0])[1:-1] + ' %.3f'%(time.time(),) + '\n'
 		sock.sendto(sdata, (UDP_IP, UDP_PORT))
 		sample_counter += 1	
 
