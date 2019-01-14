@@ -7,12 +7,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
+from ft_calib import calibrate_ft_reading, load_calib_matrix
+
 
 if __name__== "__main__":
 
 	if len(sys.argv) < 5:
-		print("usage: send_UDP.py <sample_rate> <dest_host(ip_address or hostname)> <device> <channel_list> [<dest_port>] \n default dest_port: 5000")
-		print("e.g.: send_UDP.py 1000 irlab-ubuntu-16 Dev2 [0,1,2,3,4,5] 5000")
+		print("usage: send_UDP.py <sample_rate> <dest_host(ip_address or hostname)> <device> <channel_list> [calib_file] [<dest_port>] \n default dest_port: 5000")
+		print("e.g.: send_UDP.py 1000 irlab-ubuntu-16 Dev2 [0,1,2,3,4,5] 5000 FT14509.cal")
 		exit(1)
 	
 	SAMPLE_RATE = sys.argv[1]
@@ -20,9 +22,16 @@ if __name__== "__main__":
 	UDP_PORT = 50000
 	device = sys.argv[3]#'Dev2'
 	channel_list = eval(sys.argv[4])
+
+	calib_matrix = np.eye(6)
 	
 	if len(sys.argv) == 6:
-		UDP_PORT = int(sys.argv[5])
+		calib_file = sys.argv[5]
+		calib_matrix = load_calib_matrix(calib_file)
+
+
+	if len(sys.argv) == 7:
+		UDP_PORT = int(sys.argv[6])
 
 	print("UDP target IP:", UDP_IP)
 	print("UDP target port:", UDP_PORT)
@@ -63,12 +72,15 @@ if __name__== "__main__":
 	quit = False
 
 	print("Transmitting data... On a separate client, connect to UDP address: %s port: %d to receive it.\n\n"%(UDP_IP,UDP_PORT,))
+	bias = np.zeros(6)
+
 	while not quit:
-		data, samples_per_channel_received = task.read()
+		raw_data, samples_per_channel_received = task.read()
 		
+		data = calibrate_ft_reading(raw_data[0], calib_matrix)
 
 		#print "Sample DATA: ", str(data[0])[1:-1]
-		sdata = str(data[0])[1:-1] + ' %.3f'%(time.time(),) + '\n'
+		sdata = str(data)[1:-1] + ' %.3f'%(time.time(),) + '\n'
 		sock.sendto(sdata, (UDP_IP, UDP_PORT))
 		sample_counter += 1	
 

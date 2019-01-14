@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import time
 import daqmx
 import matplotlib.pyplot as plt
@@ -37,18 +39,18 @@ while not quit:
 	all_data = np.vstack([all_data,data[0]])
 	sample_counter += 1
 
-	print "Sample DATA: ", data[0]
+	print("Sample DATA: ", data[0])
 
 
 	elapsed_time = time.time() - start
 	if elapsed_time > sampleTime:
 		quit = True
 
-		print "Time is up!"
+		print("Time is up!")
 
-print "Total samples collected:", sample_counter, " samples"
-print "Time elapsed", elapsed_time, " seconds"
-print "Observed Frequency", sample_counter/elapsed_time, " Hz"
+print("Total samples collected:", sample_counter, " samples")
+print("Time elapsed", elapsed_time, " seconds")
+print("Observed Frequency", sample_counter/elapsed_time, " Hz")
 
 plt.figure()
 plt.plot(all_data)
