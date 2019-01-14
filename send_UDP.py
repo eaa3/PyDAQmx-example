@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import socket
 import time
 import daqmx
@@ -8,20 +10,23 @@ import sys
 
 if __name__== "__main__":
 
-	if len(sys.argv) < 3:
-		print "usage: send_UDP.py <sample_rate> <dest_ip> [<dest_port>] \n default dest_port: 5000"
+	if len(sys.argv) < 5:
+		print("usage: send_UDP.py <sample_rate> <dest_host(ip_address or hostname)> <device> <channel_list> [<dest_port>] \n default dest_port: 5000")
+		print("e.g.: send_UDP.py 1000 irlab-ubuntu-16 Dev2 [0,1,2,3,4,5] 5000")
 		exit(1)
 	
 	SAMPLE_RATE = sys.argv[1]
 	UDP_IP = sys.argv[2]
 	UDP_PORT = 50000
+	device = sys.argv[3]#'Dev2'
+	channel_list = eval(sys.argv[4])
 	
-	if len(sys.argv) == 4:
-		UDP_PORT = int(sys.argv[3])
+	if len(sys.argv) == 6:
+		UDP_PORT = int(sys.argv[5])
 
-	print "UDP target IP:", UDP_IP
-	print "UDP target port:", UDP_PORT
-	print "Loop rate:",
+	print("UDP target IP:", UDP_IP)
+	print("UDP target port:", UDP_PORT)
+	print("Loop rate:", SAMPLE_RATE)
 	#print "message:", MESSAGE
 
 	sock = socket.socket(socket.AF_INET, # Internet
@@ -32,12 +37,11 @@ if __name__== "__main__":
 	# Create a task object
 	task = daqmx.tasks.Task()
 	task.sample_rate = 1000
-	device = 'Dev2'
+	
 	channels = []
 
 	# Create a channel object
-	MAX_CHANNELS = 6
-	for channel_idx in range(MAX_CHANNELS):
+	for channel_idx in channel_list:
 		channel = daqmx.channels.AnalogInputVoltageChannel()
 		channel.physical_channel =  "%s/ai%d"%(device,channel_idx,)
 
@@ -58,7 +62,7 @@ if __name__== "__main__":
 	sample_counter = 0
 	quit = False
 
-	print "Transmitting data... On a separate client, connect to UDP address: %s port: %d to receive it.\n\n"%(UDP_IP,UDP_PORT,)
+	print("Transmitting data... On a separate client, connect to UDP address: %s port: %d to receive it.\n\n"%(UDP_IP,UDP_PORT,))
 	while not quit:
 		data, samples_per_channel_received = task.read()
 		
