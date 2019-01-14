@@ -29,4 +29,4 @@ def calibrate_ft_reading(ft_reading, calib_matrix):
 	if ft_reading is None:
 		return None
 
-	return calib_matrix.dot(ft_reading) - np.array([2.5448695, 0.78797518, 3.17794361, -0.01304389, -0.35275512, -0.00642459]
+	return calib_matrix.dot(ft_reading)
