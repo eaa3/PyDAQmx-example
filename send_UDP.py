@@ -104,7 +104,7 @@ if __name__== "__main__":
 		data = calibrate_ft_reading(raw_data[0] - bias, calib_matrix)
 
 		#print("Sample Raw DATA: ", str(raw_data[0])[1:-1])
-		sdata = ",".join(map(str,data) + ['%.3f\n\0'%(time.time(),)]) 
+		sdata = ",".join(map(str,data) + ['%.9f\n\0'%(time.time(),)]) 
 		#print("Sample Calbtd DATA: ", sdata)
 		sock.sendto(sdata, (UDP_IP, UDP_PORT))
 		sample_counter += 1	
