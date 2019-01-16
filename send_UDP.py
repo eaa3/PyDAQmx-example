@@ -14,7 +14,7 @@ if __name__== "__main__":
 
 	if len(sys.argv) < 5:
 		print("usage: send_UDP.py <sample_rate> <dest_host(ip_address or hostname)> <device> <channel_list> [calib_file] [bias_calib_file] [<dest_port>] \n default dest_port: 5000")
-		print("e.g.: send_UDP.py 1000 irlab-ubuntu-16 Dev2 [0,1,2,3,4,5] 5000 FT14509.cal FT14509bias.cal")
+		print("e.g.: send_UDP.py 1000 irlab-ubuntu-16 Dev2 [0,1,2,3,4,5] FT14509.cal FT14509bias.cal 5000")
 		exit(1)
 	
 	SAMPLE_RATE = int(sys.argv[1])
@@ -26,11 +26,11 @@ if __name__== "__main__":
 	calib_matrix = np.eye(6)
 	bias = None
 	
-	if len(sys.argv) == 6:
+	if len(sys.argv) >= 6:
 		calib_file = sys.argv[5]
 		calib_matrix = load_calib_matrix(calib_file)
 	
-	if len(sys.argv) == 7:
+	if len(sys.argv) >= 7:
 		bias_calib_file = sys.argv[6]
 		file = open(bias_calib_file,"r")
 		bias_line = file.readline()
@@ -38,7 +38,7 @@ if __name__== "__main__":
 		print("Loaded bias from file: ", bias)
 
 
-	if len(sys.argv) == 8:
+	if len(sys.argv) >= 8:
 		UDP_PORT = int(sys.argv[7])
 
 	print("UDP target IP:", UDP_IP)
@@ -104,8 +104,8 @@ if __name__== "__main__":
 		data = calibrate_ft_reading(raw_data[0] - bias, calib_matrix)
 
 		#print("Sample Raw DATA: ", str(raw_data[0])[1:-1])
-		#print("Sample Calbtd DATA: ", str(data)[1:-1])
-		sdata = str(data)[1:-1] + ' %.3f'%(time.time(),) + '\n'
+		sdata = ",".join(map(str,data) + ['%.3f\n\0'%(time.time(),)]) 
+		#print("Sample Calbtd DATA: ", sdata)
 		sock.sendto(sdata, (UDP_IP, UDP_PORT))
 		sample_counter += 1	
 
