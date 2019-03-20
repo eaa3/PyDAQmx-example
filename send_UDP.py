@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 import socket
-import time
+import platform
 import daqmx
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,7 +9,11 @@ import sys
 
 from ft_calib import calibrate_ft_reading, load_calib_matrix
 
-
+if platform.system() == "Windows":
+	import win_time as wt
+else:
+	import time as wt
+	
 if __name__== "__main__":
 
 	if len(sys.argv) < 5:
@@ -73,7 +77,7 @@ if __name__== "__main__":
 
 
 	task.configure_sample_clock(sample_rate=task.sample_rate,samples_per_channel=1)
-	start = time.time()
+	start = wt.time()
 	elapsed_time = 0
 	
 	bias_calib_steps = 5*SAMPLE_RATE # calibrate the bias in 5 seconds
@@ -97,24 +101,37 @@ if __name__== "__main__":
 	
 	
 	
-
+	delta_time = 0.0
+	now = wt.time()
+	avg_delta_time = 0.0
 	while not quit:
+		
+		
 		raw_data, samples_per_channel_received = task.read()
+		prev = now
+		now = wt.time()
 		
 		data = calibrate_ft_reading(raw_data[0] - bias, calib_matrix)
-
+		
+		
 		#print("Sample Raw DATA: ", str(raw_data[0])[1:-1])
-		sdata = ",".join(map(str,data) + ['%.9f\n\0'%(time.time(),)]) 
+		sdata = ",".join(map(str,data) + ['%.9f\n'%(now,)]) 
 		#print("Sample Calbtd DATA: ", sdata)
 		sock.sendto(sdata, (UDP_IP, UDP_PORT))
 		sample_counter += 1	
-
-		elapsed_time = time.time() - start
-		if elapsed_time > sampleTime:
-			sys.stdout.write("Current Loop Frequency: %d Hz\r"%(sample_counter,))
+		
+		
+		
+		elapsed_time = now - start
+		delta_time = now - prev
+		avg_delta_time = avg_delta_time*0.3 + delta_time*0.7
+		if elapsed_time >= sampleTime:
+			
+			sys.stdout.write("Current Loop Frequency: %d Hz DeltaTime: %0.9lf Freq %0.2lf\r"%(sample_counter,avg_delta_time,1.0/avg_delta_time))
 			sample_counter = 0
-			start = time.time()
+			start = wt.time()
 
 			# print "Time is up!"
-
+		
+		
 
